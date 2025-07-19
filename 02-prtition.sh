@@ -3,6 +3,7 @@ set -euo pipefail
 source ./00-env.sh
 
 echo "[+] Creating partitions on $TARGET_DISK"
+wipefs -a "$TARGET_DISK"
 sgdisk --zap-all "$TARGET_DISK"
 
 if [[ -d /sys/firmware/efi ]]; then
