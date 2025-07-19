@@ -17,5 +17,6 @@ done
 
 read -rp 'Index: ' idx
 ((idx >= 1 && idx <= ${#disks[@]})) || { echo "Invalid index"; exit 1; }
-export TARGET_DISK="/dev/$(awk '{print $1}' <<<"${disks[idx-1]}")"
+TARGET_DISK="/dev/$(awk '{print $1}' <<<"${disks[idx-1]}")"
+sed -i "s|^export TARGET_DISK=.*|export TARGET_DISK=\"$TARGET_DISK\"|" ./00-env.sh
 echo "→ selected $TARGET_DISK"
