@@ -15,13 +15,13 @@ source "$SCRIPT_DIR/00-env.sh"
 # === ステップ実行 ===
 for step in \
   01-disk-select.sh \
-  02-network-select.sh \
-  03-bootloader-select.sh \
+  02-prtition.sh \
+  03-mkfs-mount.sh \
   04-stage3.sh \
   05-make-conf.sh \
-  06-mount.sh \
-  07-chroot-prepare.sh \
-  08-chroot-exec.sh \
+  06-chroot-prepare.sh \
+  07-chroot-setup.sh \
+  08-chroot.sh \
   09-users.sh \
   10-bootloader.sh \
   11-cleanup.sh \
