@@ -3,8 +3,12 @@ set -euo pipefail
 source ./00-env.sh
 
 echo "[+] Creating partitions on $TARGET_DISK"
-wipefs -a "$TARGET_DISK"
-sgdisk --zap-all "$TARGET_DISK"
+
+maybe_ignore() {
+  "$@" || echo "[!] Ignored error from: $*"
+}
+
+maybe_ignore sgdisk --zap-all "$TARGET_DISK"
 
 if [[ -d /sys/firmware/efi ]]; then
   sgdisk -n1:0:+512M -t1:ef00 -c1:"EFI" "$TARGET_DISK"
