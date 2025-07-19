@@ -6,7 +6,7 @@ source ./00-env.sh
 inits=(openrc systemd)
 echo "== Select init system =="
 select init in "${inits[@]}"; do [[ -n $init ]] && break; done
-export INIT="$init"
+sed -i "s|^export INIT=.*|export INIT=\"$init\"|" ./00-env.sh
 
 echo "[*] Downloading Stage3 for $ARCH with $INIT..."
 
