@@ -1,10 +1,18 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
-source ./00-env.sh
 
-emerge --quiet sys-kernel/gentoo-sources sys-kernel/genkernel
+emerge --quiet sys-kernel/gentoo-sources
 
-# genkernel を使ってカーネルビルド（オプション: all または menuconfig）
-genkernel --install all
+cd /usr/src/linux
 
-echo "[+] Kernel built using genkernel."
+if [[ -f /profile/kernel.config ]]; then
+  echo ">>> Applying custom kernel config"
+  cp /profile/kernel.config .config
+else
+  echo ">>> Using defconfig"
+  make defconfig
+fi
+
+make -j$(nproc)
+make modules_install
+make install

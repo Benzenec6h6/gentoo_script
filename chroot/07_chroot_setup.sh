@@ -14,6 +14,11 @@ echo "$HOSTNAME" > /etc/hostname
 
 emerge --sync
 emerge --ask sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
+echo ">>> Installing genkernel and gentoo-sources"
+emerge --quiet sys-kernel/gentoo-sources sys-kernel/genkernel
+
+echo ">>> Building kernel with genkernel"
+genkernel all
 
 echo "[✓] Kernel sources & firmware installed"
 
