@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-source ./00_env.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/00_env.sh"
 
 emerge --quiet sys-boot/grub sys-kernel/gentoo-sources
 
