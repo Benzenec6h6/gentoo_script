@@ -2,11 +2,11 @@
 set -euo pipefail
 source ./00_env.sh
 
-if systemd-detect-virt --quiet; then
-  echo "[+] Virtual Machine detected"
+if [[ -f /sys/class/dmi/id/product_name ]] && grep -qi virtual /sys/class/dmi/id/product_name; then
+  echo "[INFO] Running in virtual machine"
   sed -i "s|^export is_vm=.*|export is_vm="true"|" ./00_env.sh
 else
-  echo "[+] Physical Machine"
+  echo "[INFO] Running on physical hardware"
   sed -i "s|^export is_vm=.*|export is_vm="false"|" ./00_env.sh
 fi
 
