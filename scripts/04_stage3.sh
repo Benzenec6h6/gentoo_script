@@ -15,6 +15,7 @@ TARBALL_PATH=$(curl -fsSL "$INFO_URL" | grep -v '^#' | awk '{print $1}') || {
   echo "[!] Failed to fetch stage3 info"; exit 1;
 }
 
+TARBALL_DIR=$(dirname "$TARBALL_PATH")
 FILENAME=$(basename "$TARBALL_PATH")
 TARBALL_URL="${BASE_URL}/${TARBALL_PATH}"
 DIGEST_URL="${TARBALL_URL}.DIGESTS"
