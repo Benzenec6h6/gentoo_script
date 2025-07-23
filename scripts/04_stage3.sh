@@ -14,8 +14,8 @@ INFO_URL="${BASE_URL}/latest-stage3-${ARCH}-${INIT}.txt"
 
 # === 最新の tarball 情報を取得 ===
 TARBALL_PATH=$(curl -fsSL "$INFO_URL" | grep -v '^#' | awk '{print $1}')
-TARBALL_DIR=$(dirname "$TARBALL_PATH")
-FILENAME=$(basename "$TARBALL_PATH")
+TARBALL_DIR=$(dirname -- "$TARBALL_PATH")
+FILENAME=$(basename -- "$TARBALL_PATH")
 
 TARBALL_URL="${BASE_URL}/${TARBALL_PATH}"
 DIGEST_URL="${TARBALL_URL}.DIGESTS"
