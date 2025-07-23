@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+source ./00_env.sh
 
 echo "[*] Inside chroot"
 

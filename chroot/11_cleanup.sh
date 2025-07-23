@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-source ./00-env.sh
+source ./00_env.sh
 
 swapoff ${DISK}2 || true
 umount -R $MOUNTPOINT || true

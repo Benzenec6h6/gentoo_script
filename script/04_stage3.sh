@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-source ./00-env.sh
+source ./00_env.sh
 
 echo "[*] Downloading Stage3 for $ARCH with $INIT..."
 

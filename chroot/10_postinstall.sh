@@ -1,5 +1,6 @@
 #!/bin/bash
 set -euo pipefail
+source ./00_env.sh
 
 # 必要パッケージ
 emerge --verbose \
