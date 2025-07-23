@@ -13,7 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/00_env.sh"
 
 # === ステップ実行 ===
-for script in ./scripts/{00..06}_*.sh; do
+for script in ./scripts/{01..06}_*.sh; do
   echo "==> Running $script"
   bash "$script"
 done
