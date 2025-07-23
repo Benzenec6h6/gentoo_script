@@ -13,23 +13,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/00-env.sh"
 
 # === ステップ実行 ===
-for step in \
-  01-disk-select.sh \
-  02-prtition.sh \
-  03-mkfs-mount.sh \
-  04-stage3.sh \
-  05-make-conf.sh \
-  06-chroot-prepare.sh \
-  07-chroot-setup.sh \
-  08-chroot.sh \
-  09-users.sh \
-  10-bootloader.sh \
-  11-cleanup.sh \
-  12-postinstall.sh
-
-do
-  echo "[→] Running $step..."
-  bash "$SCRIPT_DIR/$step"
+for script in ./scripts/{00..06}_*.sh; do
+  echo "==> Running $script"
+  bash "$script"
 done
 
 echo "[✓] Gentoo installation complete. Reboot your system."

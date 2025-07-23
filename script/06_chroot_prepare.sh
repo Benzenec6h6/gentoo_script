@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source ./00-env.sh
+
+echo "[+] Preparing for chroot..."
+
+cp --dereference /etc/resolv.conf "$MOUNTPOINT/etc/"
+mkdir -p "$MOUNTPOINT/chroot"
+mkdir -p "$MOUNTPOINT/assets"
+mkdir -p "$MOUNTPOINT/profile"
+cp -r ./chroot "$MOUNTPOINT/chroot"
+cp -r ./assets "$MOUNTPOINT/assets"
+cp -r ./profile "$MOUNTPOINT/profile"
+cp -r ./00_env.sh "$MOUNTPOINT/00_env.sh"
+
+mount "/dev/${TARGET_DISK}3" "$MOUNTPOINT"             # ルート（/）パーティション
+#mount --mkdir "/dev/${TARGET_DISK}1" "$MOUNTPOINT/boot" # /boot が別パーティションの場合
+if [[ -d /sys/firmware/efi ]]; then
+    mount --mkdir "/dev/${TARGET_DISK}1" "$MOUNTPOINT/efi"  # EFI (必要なら)
+fi
+
+mount --types proc /proc "$MOUNTPOINT/proc"
+mount --rbind /sys "$MOUNTPOINT/sys"
+mount --make-rslave "$MOUNTPOINT/sys"
+mount --rbind /dev "$MOUNTPOINT/dev"
+mount --make-rslave "$MOUNTPOINT/dev"
+
+if [[ $INIT == "systemd" ]]; then
+    mount --bind /run "$MOUNTPOINT/run"   # systemd 使用時に推奨
+fi
+echo "[✓] Ready to chroot."
+
+chroot "$MOUNTPOINT" /chroot/07_chroot_setup.sh
