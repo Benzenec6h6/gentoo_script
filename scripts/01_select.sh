@@ -4,10 +4,10 @@ source ./00_env.sh
 
 if systemd-detect-virt --quiet; then
   echo "[+] Virtual Machine detected"
-  sed -i "s|^export is_vm=.*|export is_vm="true"|" ./00-env.sh
+  sed -i "s|^export is_vm=.*|export is_vm="true"|" ./00_env.sh
 else
   echo "[+] Physical Machine"
-  sed -i "s|^export is_vm=.*|export is_vm="false"|" ./00-env.sh
+  sed -i "s|^export is_vm=.*|export is_vm="false"|" ./00_env.sh
 fi
 
 mapfile -t disks < <(lsblk -ndo NAME,SIZE,TYPE | awk '$3=="disk" && $1!~/^loop/ {print $1, $2}')
@@ -26,29 +26,29 @@ done
 read -rp 'Index: ' idx
 ((idx >= 1 && idx <= ${#disks[@]})) || { echo "Invalid index"; exit 1; }
 TARGET_DISK="/dev/$(awk '{print $1}' <<<"${disks[idx-1]}")"
-sed -i "s|^export TARGET_DISK=.*|export TARGET_DISK=\"$TARGET_DISK\"|" ./00-env.sh
+sed -i "s|^export TARGET_DISK=.*|export TARGET_DISK=\"$TARGET_DISK\"|" ./00_env.sh
 echo "→ selected $TARGET_DISK"
 
 nets=(dhcpcd NetworkManager)
 echo "== Network tool =="
 select net in "${nets[@]}"; do [[ -n $net ]] && break; done
-sed -i "s|^export NETMGR=.*|export NETMGR=\"$net\"|" ./00-env.sh
+sed -i "s|^export NETMGR=.*|export NETMGR=\"$net\"|" ./00_env.sh
 echo "→ $net"
 
 inits=(openrc systemd)
 echo "== init system =="
 select init in "${inits[@]}"; do [[ -n $inits ]] && break; done
-sed -i "s|^export INIT=.*|export INIT=\"$init\"|" ./00-env.sh
+sed -i "s|^export INIT=.*|export INIT=\"$init\"|" ./00_env.sh
 echo "→ $init"
 
 loaders=(systemd-boot grub)
 echo "== Boot loader =="
 select loader in "${loaders[@]}"; do [[ -n $loader ]] && break; done
-sed -i "s|^export BOOTLOADER=.*|export BOOTLOADER=\"$loader\"|" ./00-env.sh
+sed -i "s|^export BOOTLOADER=.*|export BOOTLOADER=\"$loader\"|" ./00_env.sh
 echo "→ $loader"
 
 #add username
 read -rp "== User name (new account): " username
 [[ -n $username ]] || { echo "Username must not be empty"; exit 1; }
-sed -i "s|^export USERNAME=.*|export USERNAME=\"$username\"|" ./00-env.sh
+sed -i "s|^export USERNAME=.*|export USERNAME=\"$username\"|" ./00_env.sh
 echo "→ user = $username"
