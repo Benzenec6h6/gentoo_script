@@ -10,7 +10,7 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # === 環境変数ロード ===
-source "$SCRIPT_DIR/00-env.sh"
+source "$SCRIPT_DIR/00_env.sh"
 
 # === ステップ実行 ===
 for script in ./scripts/{00..06}_*.sh; do
