@@ -33,7 +33,7 @@ wget -q "$DIGEST_URL" -O "$DIGEST_FILE"
 # === SHA512 チェックサム検証 ===
 echo "[*] Verifying SHA512 checksum..."
 
-grep "$FILENAME" "$DIGEST_FILE" | sha512sum -c -
+grep "  $FILENAME\$" "$DIGEST_FILE" | sha512sum -c -
 
 if [[ $? -ne 0 ]]; then
   echo "[!] SHA512 verification failed. Exiting."
