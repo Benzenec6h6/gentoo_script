@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# === スクリプトのあるディレクトリに移動して環境変数を読み込む ===
+# スクリプトディレクトリに移動
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../00_env.sh"
 
@@ -9,25 +9,31 @@ echo "[*] Downloading Stage3 for $ARCH with $INIT..."
 
 cd "$MOUNTPOINT"
 
-BASE_URL="https://bouncer.gentoo.org/fetch/root/all/releases/$ARCH/autobuilds"
+# === Stage3 メタデータ取得 ===
+BASE_URL="https://bouncer.gentoo.org/fetch/root/all/releases/${ARCH}/autobuilds"
 INFO_URL="${BASE_URL}/latest-stage3-${ARCH}-${INIT}.txt"
 
-# === 最新の tarball 情報を取得 ===
+# TARBALL 情報の取得
 TARBALL_PATH=$(curl -fsSL "$INFO_URL" | grep -v '^#' | awk '{print $1}')
 TARBALL_DIR=$(dirname -- "$TARBALL_PATH")
 FILENAME=$(basename -- "$TARBALL_PATH")
 
 TARBALL_URL="${BASE_URL}/${TARBALL_PATH}"
-DIGEST_URL="${TARBALL_URL}.DIGESTS"
+DIGEST_URL="${BASE_URL}/${TARBALL_PATH}.DIGESTS"
+DIGEST_FILE="${FILENAME}.DIGESTS"
+
+echo "[*] Downloading:"
+echo "    $FILENAME"
+echo "    $DIGEST_FILE"
 
 # === ダウンロード ===
-echo "[*] Downloading $FILENAME..."
 wget -q --show-progress "$TARBALL_URL"
-wget -q "$DIGEST_URL"
+wget -q "$DIGEST_URL" -O "$DIGEST_FILE"
 
-# === チェックサム検証 ===
-echo "[*] Verifying checksum..."
-grep "$FILENAME" "$(basename "$DIGEST_URL")" | grep SHA512 | sha512sum -c -
+# === SHA512 チェックサム検証 ===
+echo "[*] Verifying SHA512 checksum..."
+
+grep -A1 "SHA512 HASH" "$DIGEST_FILE" | tail -n1 | sha512sum -c -
 
 if [[ $? -ne 0 ]]; then
   echo "[!] SHA512 verification failed. Exiting."
@@ -38,7 +44,6 @@ fi
 echo "[*] Extracting $FILENAME to $MOUNTPOINT..."
 tar xpvf "$FILENAME" --xattrs-include='*.*' --numeric-owner
 
-# === 後始末 ===
-rm "$FILENAME" "$(basename "$DIGEST_URL")"
-
+# === 後処理 ===
+rm "$FILENAME" "$DIGEST_FILE"
 echo "[✓] Stage3 downloaded and extracted."
