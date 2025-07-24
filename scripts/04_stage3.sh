@@ -15,7 +15,7 @@ INFO_URL="${BASE_URL}/latest-stage3-${ARCH}-${INIT}.txt"
 
 # TARBALL 情報の取得
 TARBALL_PATH=$(curl -fsSL "$INFO_URL" | grep 'stage3-' | head -n1 | awk '{print $1}')
-TARBALL_DIR=$(dirname -- "$TARBALL_PATH")
+#TARBALL_DIR=$(dirname -- "$TARBALL_PATH")
 FILENAME=$(basename -- "$TARBALL_PATH")
 
 TARBALL_URL="${BASE_URL}/${TARBALL_PATH}"
@@ -33,7 +33,7 @@ wget -q "$DIGEST_URL" -O "$DIGEST_FILE"
 # === SHA512 チェックサム検証 ===
 echo "[*] Verifying SHA512 checksum..."
 
-grep -A1 "SHA512 HASH" "$DIGEST_FILE" | tail -n1 | sha512sum -c -
+grep "$FILENAME" "$DIGEST_FILE" | sha512sum -c -
 
 if [[ $? -ne 0 ]]; then
   echo "[!] SHA512 verification failed. Exiting."
