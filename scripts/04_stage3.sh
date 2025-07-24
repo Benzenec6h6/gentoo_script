@@ -33,7 +33,14 @@ wget -q "$DIGEST_URL" -O "$DIGEST_FILE"
 # === SHA512 チェックサム検証 ===
 echo "[*] Verifying SHA512 checksum..."
 
-grep "  $FILENAME\$" "$DIGEST_FILE" | sha512sum -c -
+awk -v filename_regex='^stage3-.*\.tar\.xz$' '
+  BEGIN { found = 0 }
+  /SHA512 HASH/ { found = 1; next }
+  found && $2 ~ filename_regex {
+    print $0
+    exit
+  }
+' "$DIGEST_FILE" | sha512sum -c -
 
 if [[ $? -ne 0 ]]; then
   echo "[!] SHA512 verification failed. Exiting."
