@@ -11,10 +11,10 @@ cp -r ./assets "$MOUNTPOINT/assets"
 cp -r ./profile "$MOUNTPOINT/profile"
 cp -r ./00_env.sh "$MOUNTPOINT/00_env.sh"
 
-mount "${TARGET_DISK}3" "$MOUNTPOINT"             # ルート（/）パーティション
-#mount --mkdir "${TARGET_DISK}1" "$MOUNTPOINT/boot" # /boot が別パーティションの場合
+mount "${DISK_ROOT}" "$MOUNTPOINT"             # ルート（/）パーティション
+#mount --mkdir "${DISK_BOOT}" "$MOUNTPOINT/boot" # /boot が別パーティションの場合
 if [[ -d /sys/firmware/efi ]]; then
-    mount --mkdir "${TARGET_DISK}1" "$MOUNTPOINT/efi"  # EFI (必要なら)
+    mount --mkdir "${DISK_BOOT}" "$MOUNTPOINT/efi"  # EFI (必要なら)
 fi
 
 mount --types proc /proc "$MOUNTPOINT/proc"
