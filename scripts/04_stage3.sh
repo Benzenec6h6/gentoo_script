@@ -14,10 +14,13 @@ BASE_URL="https://bouncer.gentoo.org/fetch/root/all/releases/${ARCH}/autobuilds"
 INFO_URL="${BASE_URL}/latest-stage3-${ARCH}-${INIT}.txt"
 
 # TARBALL 情報の取得
-TARBALL_PATH=$(curl -fsSL "$INFO_URL" | grep 'stage3-' | head -n1 | awk '{print $1}')
-#TARBALL_DIR=$(dirname -- "$TARBALL_PATH")
-FILENAME=$(basename -- "$TARBALL_PATH")
+TARBALL_PATH=$(curl -fsSL --no-cache "$INFO_URL" \
+    | grep -E 'stage3-.*\.tar\.xz' \
+    | head -n1 \
+    | awk '{print $1}')
 
+#TARBALL_DIR=$(dirname -- "$TARBALL_PATH")
+FILENAME=$(basename "$TARBALL_PATH")
 TARBALL_URL="${BASE_URL}/${TARBALL_PATH}"
 DIGEST_URL="${BASE_URL}/${TARBALL_PATH}.DIGESTS"
 DIGEST_FILE="${FILENAME}.DIGESTS"
@@ -32,25 +35,23 @@ wget -q "$DIGEST_URL" -O "$DIGEST_FILE"
 
 # === SHA512 チェックサム検証 ===
 echo "[*] Verifying SHA512 checksum..."
+SHA_LINE=$(awk -v filename_regex="^stage3-.*\.tar\.xz$" '
+    BEGIN {found=0}
+    /SHA512 HASH/ {found=1; next}
+    found && $2 ~ filename_regex {print $0; exit}
+' "$DIGEST_FILE")
 
-awk -v filename_regex='^stage3-.*\.tar\.xz$' '
-  BEGIN { found = 0 }
-  /SHA512 HASH/ { found = 1; next }
-  found && $2 ~ filename_regex {
-    print $0
-    exit
-  }
-' "$DIGEST_FILE" | sha512sum -c -
-
-if [[ $? -ne 0 ]]; then
-  echo "[!] SHA512 verification failed. Exiting."
-  exit 1
+if [[ -z "$SHA_LINE" ]]; then
+    echo "[!] Could not find SHA512 hash in DIGESTS"
+    exit 1
 fi
+
+echo "$SHA_LINE" | sha512sum -c -
 
 # === 展開 ===
 echo "[*] Extracting $FILENAME to $MOUNTPOINT..."
 tar xpvf "$FILENAME" --xattrs-include='*.*' --numeric-owner
 
 # === 後処理 ===
-rm "$FILENAME" "$DIGEST_FILE"
+rm -f "$FILENAME" "$DIGEST_FILE"
 echo "[✓] Stage3 downloaded and extracted."
