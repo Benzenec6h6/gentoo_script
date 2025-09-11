@@ -14,7 +14,7 @@ BASE_URL="https://bouncer.gentoo.org/fetch/root/all/releases/${ARCH}/autobuilds"
 INFO_URL="${BASE_URL}/latest-stage3-${ARCH}-${INIT}.txt"
 
 # TARBALL 情報の取得
-TARBALL_PATH=$(curl -fsSL --no-cache "$INFO_URL" \
+TARBALL_PATH=$(curl -fsSL "$INFO_URL" \
     | grep -E 'stage3-.*\.tar\.xz' \
     | head -n1 \
     | awk '{print $1}')
