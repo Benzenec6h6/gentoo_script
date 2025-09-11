@@ -5,16 +5,16 @@ source "$SCRIPT_DIR/00_env.sh"
 
 echo "[+] Formatting partitions and mounting..."
 
-mkfs.ext4 -L root "${TARGET_DISK}3"
-mount "${TARGET_DISK}3" "$MOUNTPOINT"
+mkfs.ext4 -L root "${DISK_ROOT}"
+mount "${DISK_ROOT}" "$MOUNTPOINT"
 
-mkswap "${TARGET_DISK}2"
-swapon "${TARGET_DISK}2"
+mkswap "${DISK_SWAP}"
+swapon "${DISK_SWAP}"
 
 if [[ -d /sys/firmware/efi ]]; then
-  mkfs.fat -F32 "${TARGET_DISK}1"
+  mkfs.fat -F32 "${DISK_BOOT}"
   mkdir -p "$MOUNTPOINT/boot"
-  mount "${TARGET_DISK}1" "$MOUNTPOINT/boot"
+  mount "${DISK_BOOT}" "$MOUNTPOINT/boot"
 else
   mkdir -p "$MOUNTPOINT/boot"
 fi
