@@ -23,10 +23,12 @@ echo "127.0.0.1 localhost" > /etc/hosts
 echo "$HOSTNAME" > /etc/hostname
 
 # === パッケージ同期・準備 ===
-emerge --sync --quiet
+emerge-webrsync
+#emerge --sync --quiet
 
 # === カーネルとファームウェア関連パッケージ ===
-emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
+#emerge --ask @system
+emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware @system
 
 # === カーネルビルド用 genkernel 導入 ===
 echo ">>> Installing genkernel"
