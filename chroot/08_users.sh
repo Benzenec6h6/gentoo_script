@@ -8,6 +8,7 @@ echo root:root | chpasswd
 echo "$USERNAME:$USERNAME" | chpasswd
 
 # sudoers
+emerge --ask app-admin/sudo
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
 echo "[+] User $USERNAME created with sudo access."
