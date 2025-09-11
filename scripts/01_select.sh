@@ -89,3 +89,8 @@ read -rp "== User name (new account): " username
 [[ -n "$username" ]] || { echo "Username must not be empty"; exit 1; }
 update_env "USERNAME" "$username"
 echo "→ user = $username"
+
+# ---- password ----
+read -rp "== Password (new password): " password
+[[ -n $password ]] || { echo "Password must not be empty"; exit 1; }
+update_env "PASSWORD" "$password"
