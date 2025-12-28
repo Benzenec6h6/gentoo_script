@@ -1,3 +1,11 @@
-x11-wm/openbox branding
-media-sound/alsa-utils alsa
-net-misc/networkmanager nmtui dhclient
+# OpenRC + Desktop 基盤
+virtual/libudev systemd
+sys-auth/elogind policykit
+sys-auth/pam elogind
+sys-auth/polkit elogind
+
+# 循環依存回避
+sys-libs/libcap -pam
+
+# GUI 基本
+media-libs/freetype harfbuzz
