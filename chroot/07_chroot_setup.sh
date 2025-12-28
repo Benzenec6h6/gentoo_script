@@ -16,7 +16,8 @@ locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
 # === キーマップ設定 ===
-echo "KEYMAP=jp106" > /etc/vconsole.conf
+#echo "KEYMAP=jp106" > /etc/vconsole.conf これはsystemd
+echo 'keymap="jp106"' > /etc/conf.d/keymaps #こちらはopenrc
 
 # === ホスト情報設定 ===
 echo "127.0.0.1 localhost" > /etc/hosts
@@ -28,7 +29,8 @@ emerge-webrsync
 
 # === カーネルとファームウェア関連パッケージ ===
 #emerge --ask @system
-emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware @system
+emerge --quiet @system
+emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
 
 # === カーネルビルド用 genkernel 導入 ===
 echo ">>> Installing genkernel"
