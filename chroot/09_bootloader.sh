@@ -14,11 +14,10 @@ if [[ "$BOOTLOADER" == "grub" ]]; then
   grub-mkconfig -o /boot/grub/grub.cfg
 else
   bootctl install
-  cp ./assets/loader.conf /assets/loader.conf
+  cp "$SCRIPT_DIR/assets/loader.conf" /boot/loader/loader.conf
   
   TEMPLATE="./assets/gentoo.conf.template"
   OUTPUT="/boot/loader/entries/gentoo.conf"
-  cp "$TEMPLATE" "$OUTPUT"
   sed "s|@PARTUUID@|$PARTUUID|g" "$TEMPLATE" > "$OUTPUT"
 
 fi
