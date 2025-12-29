@@ -13,8 +13,8 @@ swapon "${DISK_SWAP}"
 
 if [[ -d /sys/firmware/efi ]]; then
   mkfs.fat -F32 "${DISK_BOOT}"
-  mkdir -p "$MOUNTPOINT/boot"
-  mount "${DISK_BOOT}" "$MOUNTPOINT/boot"
+  mkdir -p "$MOUNTPOINT/boot/efi"
+  mount "${DISK_BOOT}" "$MOUNTPOINT/boot/efi"
 else
   mkdir -p "$MOUNTPOINT/boot"
 fi
