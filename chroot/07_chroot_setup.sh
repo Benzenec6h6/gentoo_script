@@ -32,10 +32,12 @@ emerge-webrsync
 emerge --quiet @system
 emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
 
-emerge --quiet sys-kernel/gentoo-sources
+# === カーネルソース特定 ===
+KERNEL_SRC=$(ls -d /usr/src/linux-* | sort -V | tail -n1)
+echo ">>> Using kernel source: $KERNEL_SRC"
+cd "$KERNEL_SRC"
 
-cd /usr/src/linux
-
+# === config 適用 ===
 cp /profile/kernel/common.config .config
 
 if [[ "$is_vm" == "true" ]]; then
@@ -51,10 +53,8 @@ make -j$(nproc)
 make modules_install
 make install
 
-# === カーネルシンボリックリンク設定 ===
-KERNEL_SRC=$(ls -d /usr/src/linux-* | sort -V | tail -n1)
+# === /usr/src/linux symlink 更新（後処理）===
 ln -snf "$KERNEL_SRC" /usr/src/linux
-eselect kernel set "$(basename "$KERNEL_SRC")"
 
 echo "[✓] Kernel and firmware successfully built."
 
