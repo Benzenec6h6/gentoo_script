@@ -32,18 +32,29 @@ emerge-webrsync
 emerge --quiet @system
 emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
 
-# === カーネルビルド用 genkernel 導入 ===
-echo ">>> Installing genkernel"
-emerge --quiet sys-kernel/genkernel
+emerge --quiet sys-kernel/gentoo-sources
+
+cd /usr/src/linux
+
+cp /profile/kernel/common.config .config
+
+if [[ "$is_vm" == "true" ]]; then
+  echo ">>> VM detected: applying QEMU kernel config"
+  cat /profile/kernel/vm/qemu.config >> .config
+else
+  echo ">>> Bare metal detected"
+  cat /profile/kernel/laptop/baremetal.config >> .config
+fi
+
+make olddefconfig
+make -j$(nproc)
+make modules_install
+make install
 
 # === カーネルシンボリックリンク設定 ===
 KERNEL_SRC=$(ls -d /usr/src/linux-* | sort -V | tail -n1)
 ln -snf "$KERNEL_SRC" /usr/src/linux
-eselect kernel set 1
-
-# === genkernel によるカーネルビルド ===
-echo ">>> Building kernel with genkernel"
-genkernel all
+eselect kernel set "$(basename "$KERNEL_SRC")"
 
 echo "[✓] Kernel and firmware successfully built."
 
