@@ -48,10 +48,10 @@ else
   cat /profile/kernel/laptop/baremetal.config >> .config
 fi
 
-make olddefconfig
-make -j$(nproc)
-make modules_install
-make install
+make ARCH="$KERNEL_ARCH" olddefconfig
+make ARCH="$KERNEL_ARCH" -j$(nproc)
+make ARCH="$KERNEL_ARCH" modules_install
+make ARCH="$KERNEL_ARCH" install
 
 # === /usr/src/linux symlink 更新（後処理）===
 ln -snf "$KERNEL_SRC" /usr/src/linux
