@@ -3,7 +3,10 @@ set -euo pipefail
 
 # 共通変数
 export MOUNTPOINT="/mnt/gentoo"
-export ARCH="amd64"
+# Gentoo用（stage3 / profile）
+export GENTOO_ARCH="amd64"
+# カーネル用
+export KERNEL_ARCH="x86"
 export HOSTNAME="gentoo"
 export TIMEZONE="Asia/Tokyo"
 export TARGET_DISK=""
