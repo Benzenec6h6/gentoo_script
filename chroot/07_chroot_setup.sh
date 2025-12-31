@@ -28,7 +28,6 @@ emerge-webrsync
 #emerge --sync --quiet
 
 # === カーネルとファームウェア関連パッケージ ===
-#emerge --ask @system
 emerge --quiet @system
 emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
 
