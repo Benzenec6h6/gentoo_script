@@ -37,15 +37,6 @@ get_partition_name() {
   fi
 }
 
-# VM 判定
-if [[ -f /sys/class/dmi/id/product_name ]] && grep -qi virtual /sys/class/dmi/id/product_name; then
-  echo "[INFO] Running in virtual machine"
-  update_env "is_vm" "true"
-else
-  echo "[INFO] Running on physical hardware"
-  update_env "is_vm" "false"
-fi
-
 mapfile -t disks < <(lsblk -ndo NAME,SIZE,TYPE | awk '$3=="disk" && $1!~/^loop/ {print $1, $2}')
 (( ${#disks[@]} )) || { echo "No block device found"; exit 1; }
 
@@ -91,6 +82,19 @@ update_env "USERNAME" "$username"
 echo "→ user = $username"
 
 # ---- password ----
-read -rp "== Password (new password): " password
-[[ -n $password ]] || { echo "Password must not be empty"; exit 1; }
+read -srp "== Password (new password): " password
+echo
+read -srp "== Password (confirm): " password2
+echo
+[[ "$password" == "$password2" ]] || { echo "Passwords do not match"; exit 1; }
 update_env "PASSWORD" "$password"
+
+# VM 判定はopenrcだと自動で判定することができなそうなのでユーザーに明示的に選ばせる
+PROFILE=$(choose_option "== PROFILE ==" vm laptop)
+if [[ "$PROFILE" == "vm" ]]; then
+  update_env "is_vm" "true"
+else
+  update_env "is_vm" "false"
+fi
+update_env "PROFILE" "$PROFILE"
+echo "→ $PROFILE"
