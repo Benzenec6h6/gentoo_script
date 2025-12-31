@@ -5,13 +5,13 @@ set -uxo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../00_env.sh"
 
-echo "[*] Downloading Stage3 for $ARCH with $INIT..."
+echo "[*] Downloading Stage3 for $GENTOO_ARCH with $INIT..."
 
 cd "$MOUNTPOINT"
 
 # === Stage3 メタデータ取得 ===
-BASE_URL="https://bouncer.gentoo.org/fetch/root/all/releases/${ARCH}/autobuilds"
-INFO_URL="${BASE_URL}/latest-stage3-${ARCH}-${INIT}.txt"
+BASE_URL="https://bouncer.gentoo.org/fetch/root/all/releases/${GENTOO_ARCH}/autobuilds"
+INFO_URL="${BASE_URL}/latest-stage3-${GENTOO_ARCH}-${INIT}.txt"
 
 # TARBALL 情報の取得
 TARBALL_PATH=$(curl -fsSL "$INFO_URL" \
