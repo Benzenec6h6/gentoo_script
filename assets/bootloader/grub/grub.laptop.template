@@ -1,0 +1,3 @@
+GRUB_DISTRIBUTOR="Gentoo"
+
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
