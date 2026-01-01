@@ -18,3 +18,23 @@ if [[ -d /sys/firmware/efi ]]; then
 else
   mkdir -p "$MOUNTPOINT/boot"
 fi
+
+echo "[*] Collecting PARTUUIDs"
+
+ROOT_PARTUUID=$(blkid -s PARTUUID -o value "/dev/$DISK_ROOT")
+SWAP_PARTUUID=$(blkid -s PARTUUID -o value "/dev/$DISK_SWAP")
+EFI_PARTUUID=$(blkid -s PARTUUID -o value "/dev/$DISK_BOOT")
+
+sed -i "/^export ROOT_PARTUUID=/d" "$SCRIPT_DIR/00_env.sh"
+sed -i "/^export SWAP_PARTUUID=/d" "$SCRIPT_DIR/00_env.sh"
+sed -i "/^export EFI_PARTUUID=/d"  "$SCRIPT_DIR/00_env.sh"
+
+cat >> "$SCRIPT_DIR/00_env.sh" <<EOF
+export ROOT_PARTUUID="$ROOT_PARTUUID"
+export SWAP_PARTUUID="$SWAP_PARTUUID"
+export EFI_PARTUUID="$EFI_PARTUUID"
+EOF
+
+echo "→ root=$ROOT_PARTUUID"
+echo "→ swap=$SWAP_PARTUUID"
+echo "→ efi =$EFI_PARTUUID"
