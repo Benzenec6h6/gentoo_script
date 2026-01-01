@@ -29,7 +29,7 @@ emerge-webrsync
 
 # === カーネルとファームウェア関連パッケージ ===
 emerge --quiet @system
-emerge --quiet sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
+emerge --quiet sys-kernel/dracut sys-kernel/gentoo-sources sys-kernel/installkernel linux-firmware
 
 # === カーネルソース特定 ===
 KERNEL_SRC=$(ls -d /usr/src/linux-* | sort -V | tail -n1)
@@ -39,7 +39,7 @@ cd "$KERNEL_SRC"
 # === config 適用 ===
 if [[ "$is_vm" == "true" ]]; then
   echo ">>> VM detected: applying QEMU kernel config"
-  cp /profile/kernel/vm/qemu.config .config
+  cp /assets/kernel/vm/qemu.config .config
 else
   echo ">>> Bare metal detected"
   cp /profile/kernel/laptop/kernel.config .config
@@ -55,6 +55,27 @@ make ARCH="$KERNEL_ARCH" install
 ln -snf "$KERNEL_SRC" /usr/src/linux
 
 echo "[✓] Kernel and firmware successfully built."
+
+KERNEL_VERSION=$(basename "$KERNEL_SRC" | sed 's/linux-//')
+
+dracut --force \
+  --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID}" \
+  "/boot/initramfs-${KERNEL_VERSION}.img" \
+  "$KERNEL_VERSION"
+
+
+echo "[*] Generating /etc/fstab"
+
+TEMPLATE="$SCRIPT_DIR/assets/profile/fstab.template"
+OUTPUT="/etc/fstab"
+
+sed \
+  -e "s|@ROOT_PARTUUID@|$ROOT_PARTUUID|g" \
+  -e "s|@SWAP_PARTUUID@|$SWAP_PARTUUID|g" \
+  -e "s|@EFI_PARTUUID@|$EFI_PARTUUID|g" \
+  "$TEMPLATE" > "$OUTPUT"
+
+cat /etc/fstab
 
 # === 続きのスクリプト実行 ===
 for script in /chroot/{08..11}_*.sh; do
