@@ -39,8 +39,7 @@ cd "$KERNEL_SRC"
 # === config 適用 ===
 if [[ "$is_vm" == "true" ]]; then
   echo ">>> VM detected: applying QEMU kernel config"
-  cp /profile/kernel/vm/common.config .config
-  cat /profile/kernel/vm/qemu.config >> .config
+  cp /profile/kernel/vm/qemu.config .config
 else
   echo ">>> Bare metal detected"
   cp /profile/kernel/laptop/kernel.config .config
