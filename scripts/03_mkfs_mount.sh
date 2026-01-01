@@ -21,9 +21,9 @@ fi
 
 echo "[*] Collecting PARTUUIDs"
 
-ROOT_PARTUUID=$(blkid -s PARTUUID -o value "/dev/$DISK_ROOT")
-SWAP_PARTUUID=$(blkid -s PARTUUID -o value "/dev/$DISK_SWAP")
-EFI_PARTUUID=$(blkid -s PARTUUID -o value "/dev/$DISK_BOOT")
+ROOT_PARTUUID=$(blkid -s PARTUUID -o value "$DISK_ROOT")
+SWAP_PARTUUID=$(blkid -s PARTUUID -o value "$DISK_SWAP")
+EFI_PARTUUID=$(blkid -s PARTUUID -o value "$DISK_BOOT")
 
 sed -i "/^export ROOT_PARTUUID=/d" "$SCRIPT_DIR/00_env.sh"
 sed -i "/^export SWAP_PARTUUID=/d" "$SCRIPT_DIR/00_env.sh"
