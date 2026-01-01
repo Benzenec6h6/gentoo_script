@@ -29,7 +29,7 @@ rc-update add NetworkManager default
 #INNER
 
 # xinitrc
-echo "exec openbox-session" > /home/$USERNAME/.xinitrc
+#echo "exec openbox-session" > /home/$USERNAME/.xinitrc
 
 # 権限の修正
-chown -R $USERNAME:$USERNAME /home/$USERNAME
+#chown -R $USERNAME:$USERNAME /home/$USERNAME
