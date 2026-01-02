@@ -30,8 +30,8 @@ echo "    $FILENAME"
 echo "    $DIGEST_FILE"
 
 # === ダウンロード ===
-wget -q --show-progress "$TARBALL_URL"
-wget -q "$DIGEST_URL" -O "$DIGEST_FILE"
+wget -c --tries=5 --timeout=20 --show-progress "$TARBALL_URL"
+wget -q --tries=5 "$DIGEST_URL" -O "$DIGEST_FILE"
 
 # === SHA512 チェックサム検証 ===
 echo "[*] Verifying SHA512 checksum..."
