@@ -1,57 +1,67 @@
 #!/usr/bin/env bash
 set -uxo pipefail
 
-# スクリプトディレクトリに移動
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../00_env.sh"
 
-echo "[*] Downloading Stage3 for $GENTOO_ARCH with $INIT..."
+# 日本国内の信頼できるミラーリスト
+MIRRORS=(
+    "https://ftp.jaist.ac.jp/pub/Linux/Gentoo"
+    "https://mirror.linux.jp/gentoo"
+    "https://ftp.riken.jp/Linux/gentoo"
+)
 
+echo "[*] Downloading Stage3 for $GENTOO_ARCH with $INIT..."
 cd "$MOUNTPOINT"
 
-# === Stage3 メタデータ取得 ===
-BASE_URL="https://bouncer.gentoo.org/fetch/root/all/releases/${GENTOO_ARCH}/autobuilds"
-INFO_URL="${BASE_URL}/latest-stage3-${GENTOO_ARCH}-${INIT}.txt"
+SUCCESS=false
 
-# TARBALL 情報の取得
-TARBALL_PATH=$(curl -fsSL "$INFO_URL" \
-    | grep -E 'stage3-.*\.tar\.xz' \
-    | head -n1 \
-    | awk '{print $1}')
+for MIRROR in "${MIRRORS[@]}"; do
+    echo "[-] Trying Mirror: $MIRROR"
+    
+    # 1. メタデータURLの構築
+    # ミラーの場合は releases/$ARCH/autobuilds/ 直下に最新情報がある
+    BASE_AUTOBULDS="${MIRROR}/releases/${GENTOO_ARCH}/autobuilds"
+    INFO_URL="${BASE_AUTOBULDS}/latest-stage3-${GENTOO_ARCH}-${INIT}.txt"
+    
+    # 2. TARBALLパスを取得（リトライ付き）
+    TARBALL_PATH=$(curl -fsSL --retry 2 --connect-timeout 5 "$INFO_URL" | grep -v '^#' | grep ".tar.xz" | head -n1 | awk '{print $1}') || continue
+    
+    # URLを組み立てる
+    FILENAME=$(basename "$TARBALL_PATH")
+    TARBALL_URL="${BASE_AUTOBULDS}/${TARBALL_PATH}"
+    DIGEST_URL="${TARBALL_URL}.DIGESTS"
+    
+    echo "[*] Target URL: $TARBALL_URL"
 
-#TARBALL_DIR=$(dirname -- "$TARBALL_PATH")
-FILENAME=$(basename "$TARBALL_PATH")
-TARBALL_URL="${BASE_URL}/${TARBALL_PATH}"
-DIGEST_URL="${BASE_URL}/${TARBALL_PATH}.DIGESTS"
-DIGEST_FILE="${FILENAME}.DIGESTS"
+    # 3. 本体ダウンロード（404なら即座に次のミラーへ）
+    if wget -c --tries=3 --timeout=20 --show-progress "$TARBALL_URL"; then
+        wget -q "$DIGEST_URL" -O "${FILENAME}.DIGESTS"
+        
+        # 4. チェックサム検証
+        echo "[*] Verifying SHA512..."
+        # 既存のロジックを流用（SHA512 HASHの次の行からファイル名を探す）
+        if grep -A 100 "# SHA512 HASH" "${FILENAME}.DIGESTS" | grep "$FILENAME" | sha512sum -c -; then
+            SUCCESS=true
+            break
+        else
+            echo "[!] Checksum failed. Removing and trying next mirror."
+            rm -f "$FILENAME" "${FILENAME}.DIGESTS"
+        fi
+    else
+        echo "[!] Download failed (possibly 404 or Timeout). Trying next..."
+    fi
+done
 
-echo "[*] Downloading:"
-echo "    $FILENAME"
-echo "    $DIGEST_FILE"
-
-# === ダウンロード ===
-wget -c --tries=5 --timeout=20 --show-progress "$TARBALL_URL"
-wget -q --tries=5 "$DIGEST_URL" -O "$DIGEST_FILE"
-
-# === SHA512 チェックサム検証 ===
-echo "[*] Verifying SHA512 checksum..."
-SHA_LINE=$(awk -v filename_regex="^stage3-.*\.tar\.xz$" '
-    BEGIN {found=0}
-    /SHA512 HASH/ {found=1; next}
-    found && $2 ~ filename_regex {print $0; exit}
-' "$DIGEST_FILE")
-
-if [[ -z "$SHA_LINE" ]]; then
-    echo "[!] Could not find SHA512 hash in DIGESTS"
+if [ "$SUCCESS" = false ]; then
+    echo "[!!!] All attempts failed. Please check the network or GENTOO_ARCH/INIT settings."
     exit 1
 fi
 
-echo "$SHA_LINE" | sha512sum -c -
-
 # === 展開 ===
-echo "[*] Extracting $FILENAME to $MOUNTPOINT..."
+echo "[*] Extracting $FILENAME..."
 tar xpvf "$FILENAME" --xattrs-include='*.*' --numeric-owner
 
 # === 後処理 ===
-rm -f "$FILENAME" "$DIGEST_FILE"
-echo "[✓] Stage3 downloaded and extracted."
+rm -f "$FILENAME" "${FILENAME}.DIGESTS"
+echo "[✓] Stage3 successfully installed."
