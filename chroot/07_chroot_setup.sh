@@ -57,11 +57,16 @@ ln -snf "$KERNEL_SRC" /usr/src/linux
 echo "[✓] Kernel and firmware successfully built."
 
 #KERNEL_VERSION=$(basename "$KERNEL_SRC" | sed 's/linux-//')
-KERNEL_VERSION=$(make -s kernelrelease)
+KERNEL_VERSION="$(make -s kernelrelease)"
+
+DRACUT_DRIVERS=""
+if [[ "$is_vm" == "true" ]]; then
+  DRACUT_DRIVERS="virtio virtio_pci virtio_blk virtio_gpu"
+fi
 
 dracut --force \
   --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID}" \
-  --add-drivers "virtio virtio_pci virtio_blk virtio_gpu" \  #vm特有の設定かもしれないので後で見直す。
+  ${DRACUT_DRIVERS:+--add-drivers "$DRACUT_DRIVERS"} \
   "/boot/initramfs-${KERNEL_VERSION}.img" \
   "$KERNEL_VERSION"
 
@@ -77,6 +82,10 @@ sed \
   "$TEMPLATE" > "$OUTPUT"
 
 cat /etc/fstab
+
+#one time
+echo "uname -r = $(uname -r)"
+ls /lib/modules
 
 # === 続きのスクリプト実行 ===
 for script in /chroot/{08..11}_*.sh; do
