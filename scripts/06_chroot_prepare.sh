@@ -21,4 +21,4 @@ if [[ $INIT == "systemd" ]]; then
 fi
 echo "[✓] Ready to chroot."
 
-chroot "$MOUNTPOINT" /chroot/07_chroot_setup.sh
+chroot "$MOUNTPOINT" /bin/bash -l -c "/chroot/07_chroot_setup.sh"
