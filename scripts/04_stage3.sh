@@ -38,18 +38,20 @@ for MIRROR in "${MIRRORS[@]}"; do
     if wget -c --tries=3 --timeout=20 --show-progress "$TARBALL_URL"; then
         wget -q "$DIGEST_URL" -O "${FILENAME}.DIGESTS"
         
-        # 4. チェックサム検証 (アルゴリズム混在対策版)
-        echo "[*] Verifying SHA512 for $FILENAME ..."
-        
-        # SHA512セクションの直後にある、対象ファイル名の行だけを抽出
-        # awk を使って「SHA512 HASH」の後に最初に出てくる FILENAME の行だけを出力します
-        if awk -v f="$FILENAME" '/SHA512 HASH/{p=1;next} p&&$0~f{print;p=0}' "${FILENAME}.DIGESTS" | sha512sum -c -; then
-            SUCCESS=true
-            break
-        else
-            echo "[!] Checksum failed. Removing and trying next mirror."
-            rm -f "$FILENAME" "${FILENAME}.DIGESTS"
+        # === SHA512 チェックサム検証 ===
+        echo "[*] Verifying SHA512 checksum..."
+        SHA_LINE=$(awk -v filename_regex="^stage3-.*\.tar\.xz$" '
+            BEGIN {found=0}
+            /SHA512 HASH/ {found=1; next}
+            found && $2 ~ filename_regex {print $0; exit}
+        ' "$DIGEST_FILE")
+
+        if [[ -z "$SHA_LINE" ]]; then
+            echo "[!] Could not find SHA512 hash in DIGESTS"
+            exit 1
         fi
+
+        echo "$SHA_LINE" | sha512sum -c -
     else
         echo "[!] Download failed (possibly 404 or Timeout). Trying next..."
     fi
