@@ -38,11 +38,12 @@ for MIRROR in "${MIRRORS[@]}"; do
     if wget -c --tries=3 --timeout=20 --show-progress "$TARBALL_URL"; then
         wget -q "$DIGEST_URL" -O "${FILENAME}.DIGESTS"
         
-        # 4. チェックサム検証 (修正版)
+        # 4. チェックサム検証 (アルゴリズム混在対策版)
         echo "[*] Verifying SHA512 for $FILENAME ..."
         
-        # .DIGESTS から、今ダウンロードした FILENAME の行だけを抽出して検証に回す
-        if grep "$FILENAME" "${FILENAME}.DIGESTS" | grep -v ".asc" | grep -v ".CONTENTS" | sha512sum -c -; then
+        # SHA512セクションの直後にある、対象ファイル名の行だけを抽出
+        # awk を使って「SHA512 HASH」の後に最初に出てくる FILENAME の行だけを出力します
+        if awk -v f="$FILENAME" '/SHA512 HASH/{p=1;next} p&&$0~f{print;p=0}' "${FILENAME}.DIGESTS" | sha512sum -c -; then
             SUCCESS=true
             break
         else
