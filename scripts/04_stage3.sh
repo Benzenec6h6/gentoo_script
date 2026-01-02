@@ -37,7 +37,8 @@ for MIRROR in "${MIRRORS[@]}"; do
     # 3. 本体ダウンロード（404なら即座に次のミラーへ）
     if wget -c --tries=3 --timeout=20 --show-progress "$TARBALL_URL"; then
         wget -q "$DIGEST_URL" -O "${FILENAME}.DIGESTS"
-        
+        DIGEST_FILE="${FILENAME}.DIGESTS"
+
         # === SHA512 チェックサム検証 ===
         echo "[*] Verifying SHA512 checksum..."
         SHA_LINE=$(awk -v filename_regex="^stage3-.*\.tar\.xz$" '
@@ -52,6 +53,9 @@ for MIRROR in "${MIRRORS[@]}"; do
         fi
 
         echo "$SHA_LINE" | sha512sum -c -
+
+        SUCCESS=true
+        break
     else
         echo "[!] Download failed (possibly 404 or Timeout). Trying next..."
     fi
