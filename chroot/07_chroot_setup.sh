@@ -60,9 +60,9 @@ KERNEL_VERSION=$(basename "$KERNEL_SRC" | sed 's/linux-//')
 
 dracut --force \
   --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID}" \
+  --add-drivers "virtio virtio_pci virtio_blk virtio_gpu" \
   "/boot/initramfs-${KERNEL_VERSION}.img" \
   "$KERNEL_VERSION"
-
 
 echo "[*] Generating /etc/fstab"
 
