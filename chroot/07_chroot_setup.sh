@@ -60,7 +60,7 @@ KERNEL_VERSION=$(basename "$KERNEL_SRC" | sed 's/linux-//')
 
 dracut --force \
   --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID}" \
-  --add-drivers "virtio virtio_pci virtio_blk virtio_gpu" \
+  --add-drivers "virtio virtio_pci virtio_blk virtio_gpu" \  #vm特有の設定かもしれないので後で見直す。
   "/boot/initramfs-${KERNEL_VERSION}.img" \
   "$KERNEL_VERSION"
 
