@@ -38,10 +38,11 @@ for MIRROR in "${MIRRORS[@]}"; do
     if wget -c --tries=3 --timeout=20 --show-progress "$TARBALL_URL"; then
         wget -q "$DIGEST_URL" -O "${FILENAME}.DIGESTS"
         
-        # 4. チェックサム検証
-        echo "[*] Verifying SHA512..."
-        # 既存のロジックを流用（SHA512 HASHの次の行からファイル名を探す）
-        if grep -A 100 "# SHA512 HASH" "${FILENAME}.DIGESTS" | grep "$FILENAME" | sha512sum -c -; then
+        # 4. チェックサム検証 (修正版)
+        echo "[*] Verifying SHA512 for $FILENAME ..."
+        
+        # .DIGESTS から、今ダウンロードした FILENAME の行だけを抽出して検証に回す
+        if grep "$FILENAME" "${FILENAME}.DIGESTS" | grep -v ".asc" | grep -v ".CONTENTS" | sha512sum -c -; then
             SUCCESS=true
             break
         else
