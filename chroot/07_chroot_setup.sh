@@ -56,7 +56,8 @@ ln -snf "$KERNEL_SRC" /usr/src/linux
 
 echo "[✓] Kernel and firmware successfully built."
 
-KERNEL_VERSION=$(basename "$KERNEL_SRC" | sed 's/linux-//')
+#KERNEL_VERSION=$(basename "$KERNEL_SRC" | sed 's/linux-//')
+KERNEL_VERSION=$(make -s kernelrelease)
 
 dracut --force \
   --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID}" \
