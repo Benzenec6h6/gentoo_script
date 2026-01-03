@@ -65,8 +65,9 @@ if [[ "$is_vm" == "true" ]]; then
 fi
 
 dracut --force \
-  --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID}" \
+  --no-hostonly \
   ${DRACUT_DRIVERS:+--add-drivers "$DRACUT_DRIVERS"} \
+  --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID} rootfstype=ext4" \
   "/boot/initramfs-${KERNEL_VERSION}.img" \
   "$KERNEL_VERSION"
 
