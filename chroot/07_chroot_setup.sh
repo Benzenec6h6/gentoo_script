@@ -61,13 +61,12 @@ KERNEL_VERSION="$(make -s kernelrelease)"
 
 DRACUT_DRIVERS=""
 if [[ "$is_vm" == "true" ]]; then
-  DRACUT_DRIVERS="virtio virtio_pci virtio_blk virtio_gpu"
+  DRACUT_DRIVERS="virtio virtio_pci virtio_blk virtio_scsi virtio_gpu"
 fi
 
 dracut --force \
   --no-hostonly \
   ${DRACUT_DRIVERS:+--add-drivers "$DRACUT_DRIVERS"} \
-  --kernel-cmdline "root=PARTUUID=${ROOT_PARTUUID} rootfstype=ext4" \
   "/boot/initramfs-${KERNEL_VERSION}.img" \
   "$KERNEL_VERSION"
 
