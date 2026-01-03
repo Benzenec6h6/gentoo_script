@@ -1,6 +1,4 @@
 GRUB_DISTRIBUTOR="Gentoo"
 
 GRUB_CMDLINE_LINUX="root=PARTUUID=@ROOT_PARTUUID@ rootfstype=ext4 ro"
-GRUB_CMDLINE_LINUX_DEFAULT="console=ttyS0,115200 loglevel=7"
-
-GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 loglevel=7"
