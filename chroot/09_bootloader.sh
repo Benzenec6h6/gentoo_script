@@ -15,7 +15,10 @@ if [[ "$BOOTLOADER" == "grub" ]]; then
   # ---- /etc/default/grub を生成 ----
   if [[ "$is_vm" == "true" ]]; then
     echo "[*] VM detected: applying grub.vm.template"
-    cp "$SCRIPT_DIR/assets/bootloader/grub/grub.vm.template" /etc/default/grub
+    sed \
+      -e "s|@ROOT_PARTUUID@|$ROOT_PARTUUID|g" \
+      "$SCRIPT_DIR/assets/bootloader/grub/grub.vm.template" \
+      > /etc/default/grub
   else
     echo "[*] Bare metal detected: using default grub template"
     cp "$SCRIPT_DIR/assets/bootloader/grub/grub.template" /etc/default/grub
