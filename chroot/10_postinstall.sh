@@ -7,7 +7,6 @@ source "$SCRIPT_DIR/00_env.sh"
 emerge --verbose \
   x11-base/xorg-drivers \
   x11-base/xorg-server \
-  x11-wm/openbox \
   x11-terms/xterm \
   x11-misc/tint2 \
   x11-misc/picom \
@@ -16,7 +15,6 @@ emerge --verbose \
   network-manager-applet \
   app-misc/fastfetch \
   git
-
 
 rc-update add NetworkManager default
 
