@@ -14,7 +14,7 @@ emerge --verbose \
   net-misc/networkmanager \
   network-manager-applet \
   app-misc/fastfetch \
-  git
+  dev-vcs/git
 
 rc-update add NetworkManager default
 
