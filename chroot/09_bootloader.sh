@@ -41,7 +41,9 @@ if [[ "$BOOTLOADER" == "grub" ]]; then
 
 else
   echo "[*] Using systemd-boot"
-  emerge sys-apps/systemd-utils
+  mkdir -p /etc/portage/package.use
+  echo "sys-apps/systemd-utils boot kernel-install" >> /etc/portage/package.use/systemd-utils
+  emerge --ask --oneshot --verbose sys-apps/systemd-utils 
   bootctl install
 
   cp "$SCRIPT_DIR/assets/bootloader/systemd-boot/loader.conf" \
