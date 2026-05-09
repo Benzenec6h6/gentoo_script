@@ -43,7 +43,7 @@ else
   echo "[*] Using systemd-boot"
   mkdir -p /etc/portage/package.use
   echo "sys-apps/systemd-utils boot kernel-install" >> /etc/portage/package.use/systemd-utils
-  emerge --ask --oneshot --verbose sys-apps/systemd-utils 
+  emerge --oneshot --verbose sys-apps/systemd-utils 
   bootctl install
 
   cp "$SCRIPT_DIR/assets/bootloader/systemd-boot/loader.conf" \
@@ -52,7 +52,7 @@ else
   TEMPLATE="$SCRIPT_DIR/assets/bootloader/systemd-boot/gentoo.conf.template"
   OUTPUT="/boot/efi/loader/entries/gentoo.conf"
 
-  sed "s|@PARTUUID@|$PARTUUID|g" "$TEMPLATE" > "$OUTPUT"
+  sed "s|@PARTUUID@|$ROOT_PARTUUID|g" "$TEMPLATE" > "$OUTPUT"
 fi
 
 echo "[✓] Bootloader installation completed."
