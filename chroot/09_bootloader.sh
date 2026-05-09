@@ -47,10 +47,10 @@ else
   bootctl install
 
   cp "$SCRIPT_DIR/assets/bootloader/systemd-boot/loader.conf" \
-     /boot/loader/loader.conf
+     /boot/efi/loader/loader.conf
 
   TEMPLATE="$SCRIPT_DIR/assets/bootloader/systemd-boot/gentoo.conf.template"
-  OUTPUT="/boot/loader/entries/gentoo.conf"
+  OUTPUT="/boot/efi/loader/entries/gentoo.conf"
 
   sed "s|@PARTUUID@|$PARTUUID|g" "$TEMPLATE" > "$OUTPUT"
 fi
