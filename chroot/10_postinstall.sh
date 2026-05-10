@@ -10,9 +10,9 @@ emerge --verbose \
   x11-terms/xterm \
   x11-misc/tint2 \
   x11-misc/picom \
-  lxappearance \
+  lxde-base/lxappearance \
   net-misc/networkmanager \
-  network-manager-applet \
+  gnome-extra/nm-applet \
   app-misc/fastfetch \
   dev-vcs/git
 
