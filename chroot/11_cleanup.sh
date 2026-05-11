@@ -7,4 +7,3 @@ swapoff "$DISK_SWAP" || true
 umount -R "$MOUNTPOINT"/{proc,sys,dev} 2>/dev/null || true
 umount -R "$MOUNTPOINT" || true
 
-echo "[✓] Gentoo installation completed. You may now reboot."
