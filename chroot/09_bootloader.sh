@@ -53,6 +53,7 @@ else
   KERNEL_VERSION=$(ls /boot/vmlinuz-* 2>/dev/null | sort -V | tail -1 | sed 's|/boot/vmlinuz-||')
   echo "[+] Detected kernel version: $KERNEL_VERSION"
 
+  TEMPLATE="$SCRIPT_DIR/assets/bootloader/systemd-boot/gentoo.conf.template"
   OUTPUT="/boot/loader/entries/gentoo.conf"
 
   sed \
