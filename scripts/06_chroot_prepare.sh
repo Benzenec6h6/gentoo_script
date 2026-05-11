@@ -15,6 +15,9 @@ mount --rbind /sys "$MOUNTPOINT/sys"
 mount --make-rslave "$MOUNTPOINT/sys"
 mount --rbind /dev "$MOUNTPOINT/dev"
 mount --make-rslave "$MOUNTPOINT/dev"
+if [[ -d /sys/firmware/efi/efivars ]]; then
+    mount --bind /sys/firmware/efi/efivars "$MOUNTPOINT/sys/firmware/efi/efivars"
+fi
 
 if [[ $INIT == "systemd" ]]; then
     mount --bind /run "$MOUNTPOINT/run"   # systemd 使用時に推奨
