@@ -6,11 +6,10 @@ source "$SCRIPT_DIR/00_env.sh"
 
 echo "[*] Installing bootloader: $BOOTLOADER"
 
-emerge --quiet sys-boot/grub
-
 if [[ "$BOOTLOADER" == "grub" ]]; then
 
   echo "[*] Using GRUB bootloader"
+  emerge --quiet sys-boot/grub
 
   # ---- /etc/default/grub を生成 ----
   if [[ "$is_vm" == "true" ]]; then
@@ -46,13 +45,24 @@ else
   emerge --oneshot --verbose sys-apps/systemd-utils 
   bootctl install
 
+  mkdir -p /boot/loader/entries
+
   cp "$SCRIPT_DIR/assets/bootloader/systemd-boot/loader.conf" \
-     /boot/efi/loader/loader.conf
+    /boot/loader/loader.conf
 
-  TEMPLATE="$SCRIPT_DIR/assets/bootloader/systemd-boot/gentoo.conf.template"
-  OUTPUT="/boot/efi/loader/entries/gentoo.conf"
+  KERNEL_VERSION=$(ls /boot/vmlinuz-* 2>/dev/null | sort -V | tail -1 | sed 's|/boot/vmlinuz-||')
+  echo "[+] Detected kernel version: $KERNEL_VERSION"
 
-  sed "s|@PARTUUID@|$ROOT_PARTUUID|g" "$TEMPLATE" > "$OUTPUT"
+  OUTPUT="/boot/loader/entries/gentoo.conf"
+
+  sed \
+    -e "s|@PARTUUID@|$ROOT_PARTUUID|g" \
+    -e "s|vmlinuz-linux|vmlinuz-${KERNEL_VERSION}|g" \
+    -e "s|initramfs-linux.img|initramfs-${KERNEL_VERSION}.img|g" \
+    "$TEMPLATE" > "$OUTPUT"
+
+  echo "[+] Generated bootloader entry:"
+  cat "$OUTPUT"
 fi
 
 echo "[✓] Bootloader installation completed."
