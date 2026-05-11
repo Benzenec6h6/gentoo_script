@@ -15,6 +15,10 @@ mount --rbind /sys "$MOUNTPOINT/sys"
 mount --make-rslave "$MOUNTPOINT/sys"
 mount --rbind /dev "$MOUNTPOINT/dev"
 mount --make-rslave "$MOUNTPOINT/dev"
+if ! mountpoint -q "$MOUNTPOINT/boot"; then
+    echo "[+] Mounting boot partition..."
+    mount "${DISK_BOOT}" "$MOUNTPOINT/boot"
+fi
 if [[ -d /sys/firmware/efi/efivars ]]; then
     mount --bind /sys/firmware/efi/efivars "$MOUNTPOINT/sys/firmware/efi/efivars"
 fi
