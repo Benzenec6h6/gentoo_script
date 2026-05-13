@@ -51,14 +51,20 @@ make ARCH="$KERNEL_ARCH" -j$(nproc)
 make ARCH="$KERNEL_ARCH" modules_install
 make ARCH="$KERNEL_ARCH" install
 
-# === /usr/src/linux symlink 更新（後処理）===
-ln -snf "$KERNEL_SRC" /usr/src/linux
+# 1. 確実に /boot の実体からバージョンを取得
+KERNEL_VERSION=$(ls -t /boot/vmlinuz-* | head -n1 | sed 's|/boot/vmlinuz-||')
 
-echo "[✓] Kernel and firmware successfully built."
+# 2. 先に fstab を作る（dracut が参照する可能性があるため）
+echo "[*] Generating /etc/fstab"
+TEMPLATE="$SCRIPT_DIR/assets/profile/fstab.template"
+OUTPUT="/etc/fstab"
+sed \
+  -e "s|@ROOT_PARTUUID@|$ROOT_PARTUUID|g" \
+  -e "s|@SWAP_PARTUUID@|$SWAP_PARTUUID|g" \
+  -e "s|@EFI_PARTUUID@|$EFI_PARTUUID|g" \
+  "$TEMPLATE" > "$OUTPUT"
 
-#KERNEL_VERSION=$(basename "$KERNEL_SRC" | sed 's/linux-//')
-KERNEL_VERSION="$(make -s kernelrelease)"
-
+# 3. dracut 実行
 DRACUT_DRIVERS=""
 if [[ "$is_vm" == "true" ]]; then
   DRACUT_DRIVERS="virtio virtio_pci virtio_blk virtio_scsi virtio_gpu"
@@ -70,18 +76,10 @@ dracut --force \
   "/boot/initramfs-${KERNEL_VERSION}.img" \
   "$KERNEL_VERSION"
 
-echo "[*] Generating /etc/fstab"
+# === /usr/src/linux symlink 更新（後処理）===
+ln -snf "$KERNEL_SRC" /usr/src/linux
 
-TEMPLATE="$SCRIPT_DIR/assets/profile/fstab.template"
-OUTPUT="/etc/fstab"
-
-sed \
-  -e "s|@ROOT_PARTUUID@|$ROOT_PARTUUID|g" \
-  -e "s|@SWAP_PARTUUID@|$SWAP_PARTUUID|g" \
-  -e "s|@EFI_PARTUUID@|$EFI_PARTUUID|g" \
-  "$TEMPLATE" > "$OUTPUT"
-
-cat /etc/fstab
+echo "[✓] Kernel and firmware successfully built."
 
 #one time
 echo "uname -r = $(uname -r)"
