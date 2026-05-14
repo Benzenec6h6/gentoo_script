@@ -40,12 +40,13 @@ cd "$KERNEL_SRC"
 if [[ "$is_vm" == "true" ]]; then
   echo ">>> VM detected: applying QEMU kernel config"
   make ARCH="$KERNEL_ARCH" defconfig
-  make ARCH="$KERNEL_ARCH" kvm_guest.config
-  cat /assets/kernel/vm/qemu.config >> .config
+  ./scripts/kconfig/merge_config.sh -m .config \
+    kernel/configs/kvm_guest.config \
+    /assets/kernel/vm/qemu.config
 else
   echo ">>> Bare metal detected"
   cp /profile/kernel/laptop/kernel.config .config
-  cat /profile/kernel/laptop/baremetal.config >> .config
+  cat /profile/kernel/laptop/baremetal.config >> .config 
 fi
 make ARCH="$KERNEL_ARCH" olddefconfig
 make ARCH="$KERNEL_ARCH" -j$(nproc)
