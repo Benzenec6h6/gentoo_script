@@ -22,7 +22,11 @@ for MIRROR in "${MIRRORS[@]}"; do
     # 1. メタデータURLの構築
     # ミラーの場合は releases/$ARCH/autobuilds/ 直下に最新情報がある
     BASE_AUTOBULDS="${MIRROR}/releases/${GENTOO_ARCH}/autobuilds"
-    INFO_URL="${BASE_AUTOBULDS}/latest-stage3-${GENTOO_ARCH}-${INIT}.txt"
+    if [[ -n "${VARIANT:-}" ]]; then
+        INFO_URL="${BASE_AUTOBULDS}/latest-stage3-${GENTOO_ARCH}-${VARIANT}-${INIT}.txt"
+    else
+        INFO_URL="${BASE_AUTOBULDS}/latest-stage3-${GENTOO_ARCH}-${INIT}.txt"
+    fi
     
     # 2. TARBALLパスを取得（リトライ付き）
     TARBALL_PATH=$(curl -fsSL --retry 2 --connect-timeout 5 "$INFO_URL" | grep -v '^#' | grep ".tar.xz" | head -n1 | awk '{print $1}') || continue
@@ -41,18 +45,10 @@ for MIRROR in "${MIRRORS[@]}"; do
 
         # === SHA512 チェックサム検証 ===
         echo "[*] Verifying SHA512 checksum..."
-        SHA_LINE=$(awk -v filename_regex="^stage3-.*\.tar\.xz$" '
-            BEGIN {found=0}
-            /SHA512 HASH/ {found=1; next}
-            found && $2 ~ filename_regex {print $0; exit}
-        ' "$DIGEST_FILE")
-
-        if [[ -z "$SHA_LINE" ]]; then
-            echo "[!] Could not find SHA512 hash in DIGESTS"
-            exit 1
+        if ! grep -E "^[a-f0-7]{128}[[:space:]]+${FILENAME}$" "$DIGEST_FILE" | sha512sum -c -; then
+          echo "[!] SHA512 checksum verification FAILED!"
+          exit 1
         fi
-
-        echo "$SHA_LINE" | sha512sum -c -
 
         SUCCESS=true
         break

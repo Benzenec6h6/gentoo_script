@@ -5,6 +5,7 @@ set -euo pipefail
 export MOUNTPOINT="/mnt/gentoo"
 # Gentoo用（stage3 / profile）
 export GENTOO_ARCH="amd64"
+export VARIANT="desktop"
 # カーネル用
 export KERNEL_ARCH="x86"
 export HOSTNAME="gentoo"
