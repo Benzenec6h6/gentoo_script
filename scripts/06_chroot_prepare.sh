@@ -64,4 +64,4 @@ fi
 
 echo "[✓] Ready to chroot."
 
-chroot "$MOUNTPOINT" /bin/bash -l -c "/chroot/07_chroot_setup.sh"
+chroot "$MOUNTPOINT" /bin/bash -l -c "/chroot/07_chroot_base.sh"
