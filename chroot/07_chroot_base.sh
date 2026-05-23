@@ -46,7 +46,7 @@ EOF
 
 # === アップデート ===
 # ここで @system を更新。x86-64-v3 のバイナリが効くので一瞬で終わります
-emerge --update --deep --newuse --changed-use --auto-solv --usepkg @system --quiet
+emerge --update --deep --newuse --changed-use --usepkg @system --quiet
 
 echo "[*] Launching remaining setup scripts..."
 for script in /chroot/{08..12}_*.sh; do
