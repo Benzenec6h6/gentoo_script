@@ -15,6 +15,18 @@ echo 'keymap="jp106"' > /etc/conf.d/keymaps
 echo "127.0.0.1 localhost" > /etc/hosts
 echo "$HOSTNAME" > /etc/hostname
 
+# === CPU最適化フラグの自動設定 ===
+echo "[*] Setting up CPU_FLAGS_X86..."
+
+# 1. ツールをノンインタラクティブでインストール
+emerge --oneshot app-portage/cpuid2cpuflags
+
+# 2. ディレクトリが存在することを確認してフラグを書き出し
+mkdir -p /etc/portage/package.use
+echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
+
+echo "[✓] CPU flags successfully configured: $(cpuid2cpuflags)"
+
 # === グラフィックドライバー設定 ===
 echo "[+] Setting up video cards..."
 mkdir -p /etc/portage/package.use
