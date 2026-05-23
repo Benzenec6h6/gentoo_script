@@ -45,9 +45,9 @@ for MIRROR in "${MIRRORS[@]}"; do
 
         # === SHA512 チェックサム検証 ===
         echo "[*] Verifying SHA512 checksum..."
-        if ! grep -E "^[a-f0-7]{128}[[:space:]]+${FILENAME}$" "$DIGEST_FILE" | sha512sum -c -; then
-          echo "[!] SHA512 checksum verification FAILED!"
-          exit 1
+        if ! grep -A 1 "# SHA512 HASH" "$DIGEST_FILE" | grep -i "${FILENAME}$" | tr 'A-F' 'a-f' | sha512sum -c -; then
+            echo "[!] SHA512 checksum verification FAILED!"
+            exit 1
         fi
 
         SUCCESS=true
