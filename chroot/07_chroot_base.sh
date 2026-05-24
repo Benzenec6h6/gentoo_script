@@ -78,7 +78,7 @@ EOF
 emerge --update --deep --newuse --changed-use --usepkg @system --quiet
 
 echo "[*] Launching remaining setup scripts..."
-for script in /chroot/{08..12}_*.sh; do
+for script in /chroot/{08..11}_*.sh; do
   if [[ -x "$script" ]]; then
     echo ">>> Running $script"
     bash "$script"

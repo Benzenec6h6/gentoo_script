@@ -18,4 +18,6 @@ for script in ./scripts/{01..06}_*.sh; do
   bash "$script"
 done
 
+./chroot/12_cleanup.sh
+
 echo "[✓] Gentoo installation complete. Reboot your system."
