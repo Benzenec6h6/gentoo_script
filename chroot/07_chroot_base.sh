@@ -35,6 +35,23 @@ echo "*/* $(cpuid2cpuflags)" > /etc/portage/package.use/00cpu-flags
 
 echo "[✓] CPU flags successfully configured: $(cpuid2cpuflags)"
 
+# === 循環依存（gpm ↔ ncurses）の強制突破 ===
+echo "[*] Breaking circular dependency between gpm and ncurses..."
+
+# 1. 一時的に ncurses の gpm フラグをオフにする設定を書き込む
+mkdir -p /etc/portage/package.use
+echo "sys-libs/ncurses -gpm" >> /etc/portage/package.use/break-gpm
+
+# 2. 下のログで要求されている libglvnd の X フラグもついでに解決しておく
+echo "media-libs/libglvnd X" >> /etc/portage/package.use/glvnd
+
+# 3. 依存の輪を断ち切るために、まず ncurses だけを単体で先行インストール（oneshot）
+emerge --oneshot --quiet sys-libs/ncurses
+
+# 4. 先行インストールが終わったら、一時的な設定ファイルを削除して本来のフラグ（プロファイル標準）に戻す
+rm /etc/portage/package.use/break-gpm
+echo "[✓] Circular dependency broken successfully."
+
 # === プロファイル切り替え (コメント解除) ===
 echo "[+] Selecting desktop profile..."
 ln -snf /var/db/repos/gentoo/profiles/default/linux/amd64/23.0/desktop /etc/portage/make.profile
